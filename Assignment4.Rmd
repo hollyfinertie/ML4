@@ -10,12 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(modelr)
 library(mgcv)
+set.seed(100)
 ```
 
 ## Part I: Implementing a Simple Prediction Pipeline
 
-### Data Cleaning
-I converted an categorical variables into factors and cleaned the names. 
+### Data Import
+I converted categorical variables into factors and cleaned the names. I decided not omit missing values. 
 
 ```{r}
 nychealth = read_csv("./data/class4_p1.csv") %>% 
@@ -39,15 +40,14 @@ head(nychealth)
 ```
 
 
-## Testing and Training Data Sets
+### Testing and Training Data Sets
 Set up a testing and training data set with 70% vs 30%. 
 ```{r}
-set.seed(100)
 train_nychealth = nychealth %>% dplyr::sample_frac(.7)
 test_nychealth = dplyr::anti_join(nychealth, train_nychealth, by = 'x1')
 ```
 
-## Fit Prediction Models Using Training Data Sets
+### (1) Fit Prediction Models Using Training Data Sets
 
 Model1: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
 
@@ -62,16 +62,54 @@ model2 = lm(healthydays ~ chronic1 + bmi + povertygroup, data = train_nychealth)
 model2 %>% broom::tidy() %>% knitr::kable()
 ```
 
-## Testing 
+### (2) Apply Models to Testing Data Set
+Using RMSE as a measure of fit, the first model is the preferred model of prediction. 
+
+Model 1 RMSE = `r round(rmse(model1, test_nychealth), digits = 3)`
+Model 2 RMSE = `r round(rmse(model2, test_nychealth), digits = 3)`
+
 ```{r}
 rmse(model1, test_nychealth)
 rmse(model2, test_nychealth)
 ```
 
+### (3) Implementation of Final Model 
+
+Final Model: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
 
 
+## Part II: Conducting an Unsupervised Analysis
 
+### Data Import
 
+```{r}
+data("USArrests") 
 
+arrestdata = USArrests %>% 
+  janitor::clean_names() %>% 
+  drop_na()
+```
 
+### Hierarchical Clustering: Agglomeration Method
+
+```{r}
+set.seed(100)
+# Create Dissimilarity matrix
+diss.matrix = dist(arrestdata, method = "euclidean")
+
+# Complete Linkage
+complete_link = hclust(diss.matrix, method = "complete")
+
+# Average Linkage 
+average_link = hclust(diss.matrix, method = "average")
+
+# Single Linkage
+single_link = hclust(diss.matrix, method = "single")
+
+# Plot the obtained dendrogram
+plot(complete_link, cex = 0.6, hang = -1)
+plot(average_link, cex = 0.6, hang = -1)
+plot(single_link, cex = 0.6, hang = -1)
+
+```
 
