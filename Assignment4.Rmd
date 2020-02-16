@@ -1,0 +1,77 @@
+---
+title: "Assignment4"
+author: "Holly Finertie - HF2379"
+date: "Due: 2/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(modelr)
+library(mgcv)
+```
+
+## Part I: Implementing a Simple Prediction Pipeline
+
+### Data Cleaning
+I converted an categorical variables into factors and cleaned the names. 
+
+```{r}
+nychealth = read_csv("./data/class4_p1.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    chronic1 = as.factor(chronic1), 
+    chronic3 = as.factor(chronic3), 
+    chronic4 = as.factor(chronic4), 
+    tobacco1 = as.factor(tobacco1), 
+    alcohol1 = as.factor(alcohol1), 
+    habits5 = as.factor(habits5), 
+    habits7 = as.factor(habits7), 
+    agegroup = as.factor(agegroup),
+    dem3 = as.factor(dem3),
+    dem4 = as.factor(dem4), 
+    dem8 = as.factor(dem8),
+    povertygroup = as.factor(povertygroup)
+  )
+
+head(nychealth)
+```
+
+
+## Testing and Training Data Sets
+Set up a testing and training data set with 70% vs 30%. 
+```{r}
+set.seed(100)
+train_nychealth = nychealth %>% dplyr::sample_frac(.7)
+test_nychealth = dplyr::anti_join(nychealth, train_nychealth, by = 'x1')
+```
+
+## Fit Prediction Models Using Training Data Sets
+
+Model1: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
+
+Model2: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 BMI +  \beta_3 PovertyGroup $$
+```{r}
+model1 = lm(healthydays ~ chronic1 + chronic3 + chronic4 + bmi + tobacco1 + alcohol1 + povertygroup, data = train_nychealth)
+
+model1 %>% broom::tidy() %>% knitr::kable()
+
+model2 = lm(healthydays ~ chronic1 + bmi + povertygroup, data = train_nychealth)
+
+model2 %>% broom::tidy() %>% knitr::kable()
+```
+
+## Testing 
+```{r}
+rmse(model1, test_nychealth)
+rmse(model2, test_nychealth)
+```
+
+
+
+
+
+
+
+
