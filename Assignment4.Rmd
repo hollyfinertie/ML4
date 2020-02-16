@@ -20,7 +20,7 @@ set.seed(100)
 ## Part I: Implementing a Simple Prediction Pipeline
 
 ### Data Import
-I converted categorical variables into factors and cleaned the names. I decided not omit missing values. 
+I converted categorical variables into factors and cleaned the names. I decided not to omit missing values. 
 
 ```{r}
 nychealth = read_csv("./data/class4_p1.csv") %>% 
@@ -81,6 +81,8 @@ rmse(model2, test_nychealth)
 
 Final Model: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
 
+This model would be useful on a data set with variables that were collected and measured  in a study population that is similar to the data was trained on. I would not generalize this model to dissimilar data sets. 
+
 
 ## Part II: Conducting an Unsupervised Analysis
 
@@ -107,7 +109,7 @@ plot(complete_link, cex = 0.6, hang = -1)
 ```
 
 #### Average Agglomeration Method
-The average method computes all pairwise dissimilarities between each clusters and uses the average dissimilarities as the distance between two clusters.
+The average method computes all pairwise dissimilarities between each cluster and uses the average dissimilarities as the distance between two clusters.
 
 ```{r}
 average_link = hclust(diss.matrix, method = "average")
@@ -121,11 +123,11 @@ single_link = hclust(diss.matrix, method = "single")
 plot(single_link, cex = 0.6, hang = -1)
 ```
 
-#### Difference Between Dendograms
-The complete and average cluster dendrograms are visually pretty similar; however, the complete dendogram has larger height because we used the largest maximum distance between clusters. The single cluster dendrogram has the shortest hieght because we used the shortest distance between clusters. It is also much longer and less compact than the average and complete agglomeration methods. 
+#### Difference Between Dendrograms
+The complete and average cluster dendrograms are visually pretty similar; however, the complete dendrogram has larger height because we used the largest maximum distance between clusters. The single cluster dendrogram has the shortest height because we used the shortest distance between clusters. It is also much longer and less compact than the average and complete agglomeration methods. 
 
 #### Optimal Clusters
-Using the gap statistic below, we determine that ther optimal number of clusters is 4. 
+Using the gap statistic below, we determine that the optimal number of clusters is 4. 
 
 ```{r}
 gap_stat = clusGap(arrestdata, FUN = hcut,nstart = 25, K.max = 10, B = 50)
@@ -133,8 +135,8 @@ print(gap_stat, method = "firstmax")
 fviz_gap_stat(gap_stat)
 ```
 
-### (5) Reserach Question
-The USArrests data set includes arrests per 100,000 for each of hte 50 states from 1973. If this was 2020 data, I would review the association between demographic variables and arrest clustering across states. 
+### (5) Research Question
+The USArrests data set includes arrests per 100,000 for each of the 50 states from 1973. If this was 2020 data, I would review the association between demographic variables and arrest clustering across states. 
 
 *Question*: How are SES, race, and education variables associated with arrest clustering across states in 2020? 
 
