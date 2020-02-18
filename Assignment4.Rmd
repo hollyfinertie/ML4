@@ -1,8 +1,10 @@
 ---
 title: "Assignment4"
 author: "Holly Finertie - HF2379"
-date: "Due: 2/18/2020"
-output: html_document
+date: 'Due: 2/18/2020'
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -45,7 +47,7 @@ head(nychealth)
 
 
 ### Testing and Training Data Sets
-Set up a testing and training data set with 70% vs 30%. 
+Set up a testing and training data set with 70% vs 30% split. 
 ```{r}
 train_nychealth = nychealth %>% dplyr::sample_frac(.7)
 test_nychealth = dplyr::anti_join(nychealth, train_nychealth, by = 'x1')
@@ -53,7 +55,8 @@ test_nychealth = dplyr::anti_join(nychealth, train_nychealth, by = 'x1')
 
 ### (1) Fit Prediction Models Using Training Data Sets
 
-Model1: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
+Model1: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$  
+
 
 Model2: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 BMI +  \beta_3 PovertyGroup $$
 ```{r}
@@ -67,9 +70,10 @@ model2 %>% broom::tidy() %>% knitr::kable()
 ```
 
 ### (2) Apply Models to Testing Data Set
-Using RMSE as a measure of fit, the first model is the preferred model of prediction. 
+Using RMSE as a measure of fit, the first model is the preferred model of prediction because it has the lowest bias (lowest error).
 
-Model 1 RMSE = `r round(rmse(model1, test_nychealth), digits = 3)`
+Model 1 RMSE = `r round(rmse(model1, test_nychealth), digits = 3)`  
+
 Model 2 RMSE = `r round(rmse(model2, test_nychealth), digits = 3)`
 
 ```{r}
@@ -81,7 +85,7 @@ rmse(model2, test_nychealth)
 
 Final Model: $$ healthdays = \beta_0 + \beta_1 Chronic1 + \beta_2 Chronic3 + \beta_3 Chronic4 + \beta_4 BMI + \beta_5 Tobacco1 + \beta_6 Alcohol1 + \beta_7 PovertyGroup $$
 
-This model would be useful on a data set with variables that were collected and measured  in a study population that is similar to the data was trained on. I would not generalize this model to dissimilar data sets. 
+This model would be useful on a data set with variables that were collected and measured  in a study population that is similar to the data that the was trained on. I would not generalize this model to dissimilar data sets. 
 
 
 ## Part II: Conducting an Unsupervised Analysis
@@ -92,8 +96,7 @@ This model would be useful on a data set with variables that were collected and 
 data("USArrests") 
 
 arrestdata = USArrests %>% 
-  janitor::clean_names() %>% 
-  drop_na()
+  janitor::clean_names() 
 ```
 
 ### (4) Hierarchical Clustering: Agglomeration Method
@@ -124,13 +127,16 @@ plot(single_link, cex = 0.6, hang = -1)
 ```
 
 #### Difference Between Dendrograms
-The complete and average cluster dendrograms are visually pretty similar; however, the complete dendrogram has larger height because we used the largest maximum distance between clusters. The single cluster dendrogram has the shortest height because we used the shortest distance between clusters. It is also much longer and less compact than the average and complete agglomeration methods. 
+The complete and average cluster dendrograms are visually pretty similar; however, the complete dendrogram has larger height because we used the largest maximum distance between clusters. Additionally, the state clusters vary only slightly.   
+
+The single cluster dendrogram has the shortest height because we used the shortest distance between clusters. It is also much longer and less compact than the average and complete agglomeration methods. 
+
 
 #### Optimal Clusters
 Using the gap statistic below, we determine that the optimal number of clusters is 4. 
 
 ```{r}
-gap_stat = clusGap(arrestdata, FUN = hcut,nstart = 25, K.max = 10, B = 50)
+gap_stat = clusGap(arrestdata, FUN = hcut,nstart = 25, K.max = 9, B = 50)
 print(gap_stat, method = "firstmax")
 fviz_gap_stat(gap_stat)
 ```
